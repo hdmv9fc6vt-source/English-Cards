@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no,email=no,address=no">
+    <title>英语学习卡片 - 日历</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: #FFFFFF;
+            padding: 16px;
+            line-height: 1.7;
+            padding-bottom: 100px;
+            -webkit-overflow-scrolling: touch;
+            min-height: 100vh;
+        }
+        .header-wrap {
+            margin-bottom: 24px;
+            gap: 16px;
+            display: flex;
+            flex-direction: column;
+            background: #FFFFFF;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E8F5E8;
+        }
+        .top-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            text-align: center;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #A8D08D 0%, #C8E6C9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nav-btn-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 16px;
+        }
+        .nav-btn {
+            padding: 10px 20px;
+            border: 1px solid #E8F5E8;
+            border-radius: 8px;
+            background: #FFFFFF;
+            color: #2d3748;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover {
+            background: #F2F8F1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .current-month {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .calendar-container {
+            background: #FFFFFF;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E8F5E8;
+            margin-bottom: 24px;
+        }
+        .calendar-header {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .weekday {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            padding: 12px 0;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #FFFFFF;
+            border: 1px solid #E8F5E8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .calendar-day:hover {
+            background: #F2F8F1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+        .calendar-day.today {
+            background: #E8F5E8;
+            border-color: #A8D08D;
+        }
+        .calendar-day.has-cards {
+            background: #F2F8F1;
+            border-color: #A8D08D;
+        }
+        .day-number {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2d3748;
+        }
+        .card-count {
+            font-size: 12px;
+            color: #A8D08D;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .no-cards {
+            color: #CBD5E0;
+        }
+        .back-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #A8D08D 0%, #C8E6C9 100%);
+            color: white;
+            font-size: 36px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(168, 208, 141, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+        .back-btn:hover {
+            transform: scale(1.1) rotate(180deg);
+            box-shadow: 0 12px 40px rgba(168, 208, 141, 0.5);
+        }
+        .card-list {
+            background: #FFFFFF;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E8F5E8;
+        }
+        .card-list-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 16px;
+        }
+        .card-item {
+            padding: 16px;
+            background: #F2F8F1;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 1px solid #E8F5E8;
+        }
+        .card-item:last-child {
+            margin-bottom: 0;
+        }
+        .card-item-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        .card-item-content {
+            font-size: 14px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        /* 全面响应式设计 */
+        /* 小屏手机（iPhone SE、小屏Android） */
+        @media (max-width: 375px) {
+            .header-wrap {
+                padding: 16px;
+                gap: 12px;
+            }
+            .top-title {
+                font-size: 24px;
+            }
+            .nav-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            .calendar-container {
+                padding: 16px;
+            }
+            .weekday {
+                font-size: 14px;
+                padding: 8px 0;
+            }
+            .day-number {
+                font-size: 14px;
+            }
+            .card-count {
+                font-size: 11px;
+            }
+            .card-list {
+                padding: 16px;
+            }
+            .card-list-title {
+                font-size: 16px;
+            }
+            .card-item {
+                padding: 12px;
+                margin-bottom: 10px;
+            }
+            .card-item-title {
+                font-size: 14px;
+            }
+            .card-item-content {
+                font-size: 13px;
+                line-height: 1.6;
+            }
+            .back-btn {
+                width: 64px;
+                height: 64px;
+                font-size: 32px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+        
+        /* 中屏手机（iPhone 8、大部分Android手机） */
+        @media (min-width: 376px) and (max-width: 480px) {
+            .header-wrap {
+                padding: 20px;
+                gap: 14px;
+            }
+            .top-title {
+                font-size: 26px;
+            }
+            .calendar-container {
+                padding: 20px;
+            }
+            .weekday {
+                font-size: 15px;
+            }
+            .back-btn {
+                width: 68px;
+                height: 68px;
+                bottom: 25px;
+                right: 25px;
+            }
+        }
+        
+        /* 大屏手机（iPhone Plus系列、大屏Android手机） */
+        @media (min-width: 481px) and (max-width: 767px) {
+            .header-wrap {
+                max-width: 500px;
+                margin: 0 auto 24px;
+            }
+            .calendar-container {
+                max-width: 500px;
+                margin: 0 auto 24px;
+            }
+            .card-list {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+        }
+        
+        /* iPad竖屏 */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            body {
+                padding: 24px;
+            }
+            .header-wrap {
+                max-width: 700px;
+                margin: 0 auto 24px;
+                padding: 28px;
+            }
+            .top-title {
+                font-size: 32px;
+            }
+            .nav-btn {
+                padding: 10px 20px;
+                font-size: 17px;
+            }
+            .current-month {
+                font-size: 19px;
+            }
+            .calendar-container {
+                max-width: 700px;
+                margin: 0 auto 24px;
+                padding: 28px;
+            }
+            .weekday {
+                font-size: 17px;
+                padding: 14px 0;
+            }
+            .day-number {
+                font-size: 17px;
+            }
+            .card-count {
+                font-size: 13px;
+            }
+            .card-list {
+                max-width: 700px;
+                margin: 0 auto;
+                padding: 28px;
+            }
+            .card-list-title {
+                font-size: 21px;
+            }
+            .card-item {
+                padding: 18px;
+                margin-bottom: 16px;
+            }
+            .card-item-title {
+                font-size: 17px;
+            }
+            .card-item-content {
+                font-size: 15px;
+                line-height: 1.7;
+            }
+            .back-btn {
+                width: 72px;
+                height: 72px;
+                font-size: 36px;
+                bottom: 30px;
+                right: 30px;
+            }
+        }
+        
+        /* iPad横屏及以上 */
+        @media (min-width: 1025px) {
+            body {
+                padding: 32px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .header-wrap {
+                max-width: 900px;
+                margin: 0 auto 32px;
+                padding: 32px;
+            }
+            .calendar-container {
+                max-width: 900px;
+                margin: 0 auto 32px;
+                padding: 32px;
+            }
+            .card-list {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 32px;
+            }
+            .back-btn {
+                width: 80px;
+                height: 80px;
+                font-size: 40px;
+                bottom: 40px;
+                right: 40px;
+            }
+        }
+        
+        /* 刘海屏/灵动岛适配 */
+        @supports (top: env(safe-area-inset-top)) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: calc(100px + env(safe-area-inset-bottom));
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
+            .back-btn {
+                bottom: calc(30px + env(safe-area-inset-bottom));
+                right: calc(30px + env(safe-area-inset-right));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-wrap">
+        <h1 class="top-title">Personal English Corpus - Calendar</h1>
+        <div class="nav-btn-group">
+            <button class="nav-btn" onclick="changeMonth(-1)">← Previous Month</button>
+            <span class="current-month" id="currentMonth"></span>
+            <button class="nav-btn" onclick="changeMonth(1)">Next Month →</button>
+        </div>
+    </div>
+
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <div class="weekday">日</div>
+            <div class="weekday">一</div>
+            <div class="weekday">二</div>
+            <div class="weekday">三</div>
+            <div class="weekday">四</div>
+            <div class="weekday">五</div>
+            <div class="weekday">六</div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <div class="card-list">
+        <h2 class="card-list-title">最近添加的卡片</h2>
+        <div id="recentCards"></div>
+    </div>
+
+    <button class="back-btn" onclick="window.location.href='index.html'">←</button>
+
+    <script>
+        let currentDate = new Date();
+        let cardData = {};
+
+        // 初始化
+        window.onload = function() {
+            loadCardData();
+            renderCalendar();
+            renderRecentCards();
+        };
+
+        // 从localStorage加载卡片数据
+        function loadCardData() {
+            // 尝试从localStorage获取数据
+            const savedData = localStorage.getItem('cardData');
+            if (savedData) {
+                cardData = JSON.parse(savedData);
+            } else {
+                // 如果没有数据，尝试从主页面获取
+                cardData = {};
+            }
+        }
+
+        // 渲染日历
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // 更新当前月份显示
+            document.getElementById('currentMonth').textContent = `${year}年${month + 1}月`;
+            
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+            
+            // 获取当月第一天和最后一天
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            // 渲染42天（6周）
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                
+                // 检查是否为今天
+                const today = new Date();
+                if (date.toDateString() === today.toDateString()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // 检查是否为本月
+                if (date.getMonth() !== month) {
+                    dayElement.classList.add('no-cards');
+                }
+                
+                // 检查是否有卡片
+                const dateKey = date.toISOString().split('T')[0].replace(/-/g, '.');
+                if (cardData[dateKey]) {
+                    dayElement.classList.add('has-cards');
+                }
+                
+                // 添加日期数字
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = date.getDate();
+                
+                // 添加卡片数量
+                const cardCount = document.createElement('div');
+                cardCount.className = 'card-count';
+                if (cardData[dateKey]) {
+                    cardCount.textContent = cardData[dateKey].length;
+                }
+                
+                // 添加点击事件
+                dayElement.addEventListener('click', function() {
+                    if (cardData[dateKey]) {
+                        // 跳转到主页面并定位到对应日期
+                        window.location.href = `index.html?date=${dateKey}`;
+                    }
+                });
+                
+                dayElement.appendChild(dayNumber);
+                dayElement.appendChild(cardCount);
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        // 切换月份
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        // 渲染最近添加的卡片
+        function renderRecentCards() {
+            const recentCards = document.getElementById('recentCards');
+            recentCards.innerHTML = '';
+            
+            // 获取所有卡片并按日期排序
+            let allCards = [];
+            for (const dateKey in cardData) {
+                cardData[dateKey].forEach(card => {
+                    allCards.push({ ...card, date: dateKey });
+                });
+            }
+            
+            // 按日期降序排序
+            allCards.sort((a, b) => new Date(b.date.replace(/\./g, '-')) - new Date(a.date.replace(/\./g, '-')));
+            
+            // 显示最近5张卡片
+            const recent5 = allCards.slice(0, 5);
+            
+            if (recent5.length === 0) {
+                recentCards.innerHTML = '<p style="text-align: center; color: #CBD5E0;">暂无卡片</p>';
+                return;
+            }
+            
+            recent5.forEach(card => {
+                const cardItem = document.createElement('div');
+                cardItem.className = 'card-item';
+                
+                cardItem.innerHTML = `
+                    <div class="card-item-title">${card.title}</div>
+                    <div class="card-item-content">${card.content.replace(/<[^>]*>/g, '').substring(0, 100)}${card.content.length > 100 ? '...' : ''}</div>
+                `;
+                
+                recentCards.appendChild(cardItem);
+            });
+        }
+
+        // 导出函数，供主页面调用更新数据
+        window.updateCardData = function(newData) {
+            cardData = newData;
+            localStorage.setItem('cardData', JSON.stringify(cardData));
+            renderCalendar();
+            renderRecentCards();
+        };
+    </script>
+</body>
+</html>
