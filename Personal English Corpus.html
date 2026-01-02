@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="format-detection" content="telephone=no,email=no,address=no">
+    <title>英语学习卡片（最终版）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: #FFFFFF;
+            padding: 16px;
+            line-height: 1.7;
+            padding-bottom: 100px;
+            -webkit-overflow-scrolling: touch;
+            min-height: 100vh;
+        }
+        /* 顶部搜索+标题 */
+        .header-wrap {
+            margin-bottom: 24px;
+            gap: 16px;
+            display: flex;
+            flex-direction: column;
+            background: #FFFFFF;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E8F5E8;
+        }
+        .top-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+            text-align: center;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #A8D08D 0%, #C8E6C9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .search-box {
+            width: 100%;
+            position: relative;
+            height: 56px;
+        }
+        .search-input {
+            width: 100%;
+            height: 100%;
+            padding: 0 20px 0 50px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 28px;
+            font-size: 16px;
+            background: #ffffff;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: #A8D08D;
+            box-shadow: 0 0 0 4px rgba(168, 208, 141, 0.1), 0 6px 24px rgba(168, 208, 141, 0.15);
+        }
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #A8D08D;
+            font-size: 22px;
+        }
+        .search-tips {
+            font-size: 12px;
+            color: #718096;
+            text-align: center;
+            line-height: 1.4;
+            background: rgba(102, 126, 234, 0.05);
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        /* 标签筛选区 */
+        .filter-wrap {
+            background: #FFFFFF;
+            padding: 20px 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E8F5E8;
+        }
+        .filter-title {
+            font-size: 18px;
+            color: #2d3748;
+            margin-bottom: 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tag-delete-tips {
+            font-size: 12px;
+            color: #f56565;
+        }
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .tag-item {
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            color: #4a5568;
+            background: #f7fafc;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+        .tag-item.system-tag .tag-del-btn {
+            display: none;
+        }
+        .tag-item:hover {
+            border-color: rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .tag-item.active {
+            background: linear-gradient(135deg, #A8D08D 0%, #C8E6C9 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 6px 20px rgba(168, 208, 141, 0.3);
+            transform: translateY(-2px);
+        }
+        .tag-del-btn {
+            font-size: 11px;
+            color: #718096;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.1);
+            transition: all 0.2s ease;
+        }
+        .tag-del-btn:hover {
+            background: #f56565;
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(245, 101, 101, 0.3);
+        }
+        .custom-tag-wrap {
+            margin-top: 0;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .custom-tag-input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 24px;
+            font-size: 14px;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .custom-tag-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        .custom-tag-btn {
+            padding: 10px 22px;
+            border-radius: 24px;
+            border: none;
+            background: linear-gradient(135deg, #A8D08D 0%, #C8E6C9 100%);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+            box-shadow: 0 4px 16px rgba(168, 208, 141, 0.2);
+        }
+        .custom-tag-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(168, 208, 141, 0.3);
+        }
+        .custom-tag-btn:active {
+            background: linear-gradient(135deg, #90C981 0%, #AED5B4 100%);
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px rgba(168, 208, 141, 0.2);
+        }
+        /* 日期分组 */
+        .date-group {
+            margin-bottom: 12px;
+        }
+        .date-title {
+            font-size: 19px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 12px;
+            padding: 16px 20px;
+            background: #FFFFFF;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #E8F5E8;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        .date-title::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+        .date-title:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        .date-title:hover::before {
+            left: 100%;
+        }
+        .date-title:active {
+            transform: translateY(0) scale(0.98);
+        }
+        .date-icon {
+            color: #667eea;
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+        }
+        .date-card-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 4px 14px;
+            border-radius: 16px;
+            margin-left: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        .date-right-wrap {
+            display: flex;
+            align-items: center;
+            margin-left: auto;
+        }
+        .date-toggle-icon {
+            color: #667eea;
+            font-size: 22px;
+            font-weight: 700;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .date-cards-wrap {
+            overflow: hidden;
+            transition: height 0.3s ease;
+            height: auto;
+            padding-left: 8px;
+        }
+        /* 卡片核心样式 - 保留左滑交互 */
+        .card-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 16px;
+            overflow: hidden;
+            border-radius: 24px;
+            touch-action: pan-y;
+            height: auto;
+        }
+        /* 保留按钮组层级和位置 */
+        .card-btn-group {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 180px;
+            height: 100%;
+            display: flex;
+            z-index: 1;
+            background: transparent;
+        }
+        /* 保留卡片样式，修复滑动不穿透 */
+        .card {
+            background: #FFFFFF;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 2;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #E8F5E8;
+        }
+        .card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+        }
+        .card:active {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+        }
+        .card.selected {
+            box-shadow: 0 12px 40px rgba(156, 175, 136, 0.3);
+            border: 2px solid rgba(156, 175, 136, 0.5);
+        }
+        .card.collect {
+            border-left: 4px solid #fbbf24;
+            background: rgba(255, 251, 235, 0.95);
+        }
+        /* 卡片标题 - 保留折叠交互 */
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            background: #F2F8F1;
+            color: #333333;
+            border-radius: 12px;
+            line-height: 1.5;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            gap: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #E8F5E8;
+        }
+        .card-title-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+        }
+        .collect-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: rgba(102, 102, 102, 0.6);
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        .collect-btn:hover {
+            transform: scale(1.2);
+        }
+        .card.collect .collect-btn {
+            color: #fbbf24;
+            animation: pulse 0.3s ease;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1.2); }
+        }
+        .card-title-text {
+            flex: 1;
+        }
+        .card-title-toggle {
+            color: #666666;
+            font-size: 24px;
+            font-weight: 700;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        /* 卡片内容 - 修复展开显示不全，保留原有样式 */
+        .card-content-wrap {
+            padding: 24px;
+            transition: all 0.3s ease;
+            max-height: 2000px;
+            overflow: hidden;
+            opacity: 1;
+            background: #FFFFFF;
+            border-radius: 0 0 12px 12px;
+        }
+        .card-content-wrap.collapse {
+            max-height: 0 !important;
+            padding: 0 24px;
+            opacity: 0;
+        }
+        /* 保留编辑/删除按钮样式和交互 */
+        .card-edit-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #A8D08D 0%, #C8E6C9 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            gap: 6px;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+        .card-edit-btn::before {
+            content: "✏️";
+            font-size: 18px;
+        }
+        .card-edit-btn:hover {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        }
+        .card-edit-btn:active {
+            background: linear-gradient(135deg, #2f855a 0%, #276749 100%);
+            transform: scale(0.98);
+        }
+        .card-delete-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            gap: 6px;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+        .card-delete-btn::before {
+            content: "🗑️";
+            font-size: 18px;
+        }
+        .card-delete-btn:hover {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        }
+        .card-delete-btn:active {
+            background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+            transform: scale(0.98);
+        }
+        /* 保留标题匹配样式 - 提高优先级 */
+        .card-content {
+            font-size: 15px;
+            color: #4a5568;
+            line-height: 1.6;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        .card-title-text {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        .card-tag {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        .card-content b {
+            color: #2d3748;
+            font-weight: 600;
+        }
+        /* 保留标题匹配字段样式 - 最高优先级 */
+        .card-content .title-match {
+            color: #dc2626 !important;
+            font-weight: 700 !important;
+            text-shadow: 0 0 2px rgba(220, 38, 38, 0.1) !important;
+            background: rgba(220, 38, 38, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .card-content p {
+            margin-bottom: 16px;
+        }
+        .card-content p:last-child {
+            margin-bottom: 0;
+        }
+        .card-content blockquote {
+            margin: 16px 0;
+            padding: 12px 20px;
+            border-left: 4px solid #A8D08D;
+            background: #f5f5f5;
+            border-radius: 0 8px 8px 0;
+            color: #4a5568;
+            font-style: italic;
+            line-height: 1.5;
+        }
+        .card-content ul,
+        .card-content ol {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+        .card-content li {
+            margin-bottom: 6px;
+            line-height: 1.5;
+            color: #4a5568;
+        }
+        .card-content li:last-child {
+            margin-bottom: 0;
+        }
+        .card-content ul li {
+            list-style-type: disc;
+        }
+        .card-content ol li {
+            list-style-type: decimal;
+        }
+        .card-tag {
+            font-size: 14px;
+            padding: 6px 16px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            color: #667eea;
+            display: inline-block;
+            margin-top: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+        /* 保留富文本按钮 */
+        .format-btn-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .format-btn {
+            padding: 10px 16px;
+            border-radius: 16px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .format-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        .format-btn:active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-color: transparent;
+            transform: translateY(0) scale(0.96);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        /* 保留底部新增按钮 */
+        .add-card-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #9CAF88 0%, #A8B5C4 100%);
+            color: white;
+            font-size: 36px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(156, 175, 136, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 999;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .add-card-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 12px 40px rgba(156, 175, 136, 0.5);
+        }
+        .add-card-btn:active {
+            background: linear-gradient(135deg, #8A9A78 0%, #98A5B4 100%);
+            transform: scale(0.98) rotate(90deg);
+        }
+        /* 日历按钮 */
+        .calendar-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 120px;
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #A8D08D 0%, #C8E6C9 100%);
+            color: white;
+            font-size: 36px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 32px rgba(168, 208, 141, 0.4);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 999;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .calendar-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 40px rgba(168, 208, 141, 0.5);
+        }
+        .calendar-btn:active {
+            background: linear-gradient(135deg, #8A9A78 0%, #98A5B4 100%);
+            transform: scale(0.98);
+        }
+        /* 保留弹窗样式 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            -webkit-overflow-scrolling: touch;
+            backdrop-filter: blur(8px);
+        }
+        .modal-content {
+            background: rgba(255, 255, 255, 0.98);
+            width: 92%;
+            max-width: 520px;
+            border-radius: 28px;
+            padding: 32px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            transform: translateY(20px);
+            opacity: 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .modal.show .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 28px;
+            text-align: center;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .form-item {
+            margin-bottom: 24px;
+        }
+        .form-label {
+            font-size: 16px;
+            color: #2d3748;
+            margin-bottom: 10px;
+            display: block;
+            font-weight: 600;
+        }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 20px;
+            font-size: 16px;
+            resize: none;
+            background: #ffffff;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: #fff;
+        }
+        .form-textarea {
+            min-height: 160px;
+            line-height: 1.7;
+        }
+        .form-tips {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .modal-btn-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 32px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 16px 0;
+            border-radius: 20px;
+            border: 2px solid transparent;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .cancel-btn {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-color: rgba(102, 126, 234, 0.2);
+        }
+        .cancel-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        .cancel-btn:active {
+            background: rgba(102, 126, 234, 0.3);
+            transform: translateY(0) scale(0.98);
+        }
+        .confirm-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+        }
+        .confirm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        .confirm-btn:active {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a408f 100%);
+            transform: translateY(0) scale(0.98);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        /* 全面响应式设计 */
+        /* 小屏手机（iPhone SE、小屏Android） */
+        @media (max-width: 375px) {
+            .header-wrap {
+                padding: 16px;
+                gap: 12px;
+            }
+            .top-title {
+                font-size: 24px;
+            }
+            .search-box {
+                height: 50px;
+            }
+            .search-input {
+                padding: 0 18px 0 46px;
+            }
+            .filter-wrap {
+                padding: 16px 20px;
+            }
+            .filter-title {
+                font-size: 16px;
+            }
+            .tag-item {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            .custom-tag-btn {
+                padding: 8px 18px;
+            }
+            .date-title {
+                font-size: 17px;
+                padding: 16px 20px;
+                margin-bottom: 10px;
+                gap: 12px;
+            }
+            .date-icon {
+                font-size: 20px;
+                width: 36px;
+                height: 36px;
+            }
+            .date-card-count {
+                font-size: 13px;
+                padding: 3px 12px;
+            }
+            .date-toggle-icon {
+                font-size: 20px;
+                width: 24px;
+                height: 24px;
+            }
+            .date-group {
+                margin-bottom: 12px;
+            }
+            .card-title {
+                font-size: 17px;
+                padding: 14px 18px;
+            }
+            .card-content {
+                font-size: 15px;
+                line-height: 1.6;
+            }
+            .card-content-wrap {
+                padding: 20px;
+            }
+            .card-btn-group {
+                width: 160px;
+            }
+            .card-edit-btn,.card-delete-btn {
+                font-size: 15px;
+                gap: 4px;
+            }
+            .card-edit-btn::before,
+            .card-delete-btn::before {
+                font-size: 16px;
+            }
+            .add-card-btn {
+                width: 64px;
+                height: 64px;
+                font-size: 32px;
+                bottom: 20px;
+                right: 20px;
+            }
+            .calendar-btn {
+                width: 64px;
+                height: 64px;
+                font-size: 32px;
+                bottom: 20px;
+                right: 100px;
+            }
+            .modal-content {
+                padding: 28px;
+            }
+            .modal-title {
+                font-size: 22px;
+            }
+            .form-input, .form-textarea, .form-select {
+                padding: 14px 18px;
+            }
+            .modal-btn {
+                padding: 14px 0;
+            }
+            /* 快捷格式按钮适配 */
+            .format-btn {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+            .format-btns {
+                gap: 8px;
+            }
+        }
+        
+        /* 中屏手机（iPhone 8、大部分Android手机） */
+        @media (min-width: 376px) and (max-width: 480px) {
+            .header-wrap {
+                padding: 20px;
+                gap: 14px;
+            }
+            .top-title {
+                font-size: 26px;
+            }
+            .filter-wrap {
+                padding: 18px 22px;
+            }
+            .card-title {
+                font-size: 18px;
+                padding: 16px 20px;
+            }
+            .card-content-wrap {
+                padding: 22px;
+            }
+            .add-card-btn {
+                width: 68px;
+                height: 68px;
+                bottom: 25px;
+                right: 25px;
+            }
+            .calendar-btn {
+                width: 68px;
+                height: 68px;
+                bottom: 25px;
+                right: 115px;
+            }
+        }
+        
+        /* 大屏手机（iPhone Plus系列、大屏Android手机） */
+        @media (min-width: 481px) and (max-width: 767px) {
+            .header-wrap {
+                padding: 24px;
+                gap: 16px;
+                max-width: 500px;
+                margin: 0 auto 24px;
+            }
+            .filter-wrap {
+                max-width: 500px;
+                margin: 0 auto 24px;
+            }
+            .date-group {
+                max-width: 500px;
+                margin: 0 auto 24px;
+            }
+            .add-card-btn {
+                width: 72px;
+                height: 72px;
+                bottom: 30px;
+                right: 30px;
+            }
+            .calendar-btn {
+                width: 72px;
+                height: 72px;
+                bottom: 30px;
+                right: 120px;
+            }
+        }
+        
+        /* iPad竖屏 */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            body {
+                padding: 24px;
+            }
+            .header-wrap {
+                max-width: 700px;
+                margin: 0 auto 24px;
+                padding: 28px;
+            }
+            .top-title {
+                font-size: 32px;
+            }
+            .filter-wrap {
+                max-width: 700px;
+                margin: 0 auto 24px;
+                padding: 20px 28px;
+            }
+            .date-group {
+                max-width: 700px;
+                margin: 0 auto 20px;
+            }
+            .date-title {
+                padding: 20px 28px;
+                font-size: 21px;
+                margin-bottom: 14px;
+            }
+            .card-title {
+                font-size: 19px;
+                padding: 18px 24px;
+            }
+            .card-content-wrap {
+                padding: 28px;
+            }
+            .card-content {
+                font-size: 16px;
+                line-height: 1.7;
+            }
+            .add-card-btn {
+                width: 72px;
+                height: 72px;
+                font-size: 36px;
+                bottom: 30px;
+                right: 30px;
+            }
+            .calendar-btn {
+                width: 72px;
+                height: 72px;
+                font-size: 36px;
+                bottom: 30px;
+                right: 120px;
+            }
+            .modal-content {
+                max-width: 600px;
+                padding: 36px;
+            }
+            .modal-title {
+                font-size: 28px;
+            }
+            .form-input, .form-textarea, .form-select {
+                padding: 18px 22px;
+                font-size: 17px;
+            }
+            .modal-btn {
+                padding: 18px 0;
+                font-size: 17px;
+            }
+            /* 快捷格式按钮适配 */
+            .format-btn {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+            .format-btns {
+                gap: 12px;
+            }
+        }
+        
+        /* iPad横屏及以上 */
+        @media (min-width: 1025px) {
+            body {
+                padding: 32px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .header-wrap {
+                max-width: 900px;
+                margin: 0 auto 32px;
+                padding: 32px;
+            }
+            .filter-wrap {
+                max-width: 900px;
+                margin: 0 auto 32px;
+                padding: 24px 32px;
+            }
+            .date-group {
+                max-width: 900px;
+                margin: 0 auto 32px;
+            }
+            .date-title {
+                padding: 24px 32px;
+                font-size: 22px;
+            }
+            .card-title {
+                font-size: 19px;
+                padding: 18px 24px;
+            }
+            .card-content-wrap {
+                padding: 32px;
+            }
+            .card-content {
+                font-size: 18px;
+                line-height: 1.8;
+            }
+            .add-card-btn {
+                width: 80px;
+                height: 80px;
+                font-size: 40px;
+                bottom: 40px;
+                right: 40px;
+            }
+            .calendar-btn {
+                width: 80px;
+                height: 80px;
+                font-size: 40px;
+                bottom: 40px;
+                right: 140px;
+            }
+            .modal-content {
+                max-width: 700px;
+                padding: 40px;
+            }
+            .modal-title {
+                font-size: 32px;
+            }
+            .form-input, .form-textarea, .form-select {
+                padding: 20px 24px;
+                font-size: 18px;
+            }
+            .modal-btn {
+                padding: 20px 0;
+                font-size: 18px;
+            }
+        }
+        /* 保留刘海屏/灵动岛适配 */
+        @supports (top: env(safe-area-inset-top)) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: calc(100px + env(safe-area-inset-bottom));
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
+            .add-card-btn {
+                bottom: calc(30px + env(safe-area-inset-bottom));
+                right: calc(30px + env(safe-area-inset-right));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header-wrap">
+        <h1 class="top-title">Personal English Corpus</h1>
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="globalSearch" placeholder="Search titles/content/favorites, precise matching" oninput="globalFullSearch()">
+        </div>
+        <p class="search-tips">Swipe left for edit/delete | Long press to look up dictionary | Title folding | Daily archiving | ☆ Favorite | Title matching automatically bold and red | Tags can be deleted</p>
+    </div>
+
+    <div class="filter-wrap">
+        <div class="filter-title">
+            卡片分类筛选
+            <span class="tag-delete-tips">（自定义标签可点击×删除）</span>
+        </div>
+        <div class="tag-list" id="tagList">
+            <div class="tag-item system-tag active" onclick="filterCard('all')">全部卡片</div>
+            <div class="tag-item system-tag" onclick="filterCard('核心词汇')">核心词汇</div>
+            <div class="tag-item system-tag" onclick="filterCard('基础句型')">基础句型</div>
+            <div class="tag-item system-tag" onclick="filterCard('语法考点')">语法考点</div>
+            <div class="tag-item system-tag" onclick="filterCard('写作素材')">写作素材</div>
+        </div>
+        <div class="custom-tag-wrap">
+            <input type="text" class="custom-tag-input" id="newTagName" placeholder="新增自定义分类标签">
+            <button class="custom-tag-btn" onclick="addCustomTag()">添加</button>
+        </div>
+    </div>
+
+    <!-- 保留原有日期分组结构，新增容器确保位置正确 -->
+    <div id="dateGroupsContainer">
+        <!-- 日期分组1 -->
+        <div class="date-group">
+            <div class="date-title" onclick="toggleDateGroup(this)">
+                <span class="date-icon">📅</span>
+                <span>2026.01.02</span>
+                <span class="date-card-count">2张</span>
+                <div class="date-right-wrap">
+                    <span class="date-toggle-icon">▼</span>
+                </div>
+            </div>
+            <div class="date-cards-wrap">
+                <div class="card-container">
+                    <div class="card-btn-group">
+                        <div class="card-edit-btn" onclick="editCard(this)">编辑</div>
+                        <div class="card-delete-btn" onclick="deleteCard(this)">删除</div>
+                    </div>
+                    <div class="card" data-tag="核心词汇">
+                        <div class="card-title" onclick="toggleCardContent(this)">
+                            <div class="card-title-left">
+                                <span class="collect-btn" onclick="toggleCollect(this, event)">☆</span>
+                                <span class="card-title-text">abandon</span>
+                            </div>
+                            <span class="card-title-toggle">−</span>
+                        </div>
+                        <div class="card-content-wrap">
+                            <div class="card-content">
+                                <p>1. 及物动词 vt. 放弃；抛弃（牛津权威释义）<br>
+                                <b>例句：He had to abandon his plan due to the bad weather.</b><br>
+                                译文：由于天气恶劣，他不得不放弃他的计划。</p>
+                                <p>2. 及物动词 vt. 遗弃（人/物）<br>
+                                例句：The old man was abandoned by his children.（拓展：abandon的被动语态用法）</p>
+                            </div>
+                            <span class="card-tag">核心词汇</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-container">
+                    <div class="card-btn-group">
+                        <div class="card-edit-btn" onclick="editCard(this)">编辑</div>
+                        <div class="card-delete-btn" onclick="deleteCard(this)">删除</div>
+                    </div>
+                    <div class="card" data-tag="基础句型">
+                        <div class="card-title" onclick="toggleCardContent(this)">
+                            <div class="card-title-left">
+                                <span class="collect-btn" onclick="toggleCollect(this, event)">☆</span>
+                                <span class="card-title-text">It is + adj. + that 从句</span>
+                            </div>
+                            <span class="card-title-toggle">−</span>
+                        </div>
+                        <div class="card-content-wrap">
+                            <div class="card-content">
+                                <p><b>基础例句：It is important that we should practice English every day.</b><br>
+                                译文：我们每天练习英语是很重要的。</p>
+                                <p>拓展用法：It is + adj. + that 从句中，从句常用虚拟语气（should+动词原形），should可省略<br>
+                                <b>例句：It is necessary that all students (should) finish the homework on time.</b></p>
+                            </div>
+                            <span class="card-tag">基础句型</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 日期分组2 -->
+        <div class="date-group">
+            <div class="date-title" onclick="toggleDateGroup(this)">
+                <span class="date-icon">📅</span>
+                <span>2026.01.01</span>
+                <span class="date-card-count">1张</span>
+                <div class="date-right-wrap">
+                    <span class="date-toggle-icon">▼</span>
+                </div>
+            </div>
+            <div class="date-cards-wrap">
+                <div class="card-container">
+                    <div class="card-btn-group">
+                        <div class="card-edit-btn" onclick="editCard(this)">编辑</div>
+                        <div class="card-delete-btn" onclick="deleteCard(this)">删除</div>
+                    </div>
+                    <div class="card" data-tag="核心词汇">
+                        <div class="card-title" onclick="toggleCardContent(this)">
+                            <div class="card-title-left">
+                                <span class="collect-btn" onclick="toggleCollect(this, event)">☆</span>
+                                <span class="card-title-text">persist</span>
+                            </div>
+                            <span class="card-title-toggle">−</span>
+                        </div>
+                        <div class="card-content-wrap">
+                            <div class="card-content">
+                                <p>vi. 坚持；持续（persist常搭配介词 in，外研社权威释义）<br>
+                                <b>例句1：She persists in learning English despite the difficulties.</b><br>
+                                译文：尽管困难重重，她仍坚持学习英语。<br>
+                                <b>例句2：The rain persisted for the whole night.</b><br>
+                                译文：雨下了一整夜。</p>
+                            </div>
+                            <span class="card-tag">核心词汇</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="add-card-btn" onclick="openModal('add')">+</button>
+    <button class="calendar-btn" onclick="window.location.href='calendar.html'">📅</button>
+
+    <!-- 保留新增/编辑共用弹窗 -->
+    <div class="modal" id="cardModal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">新增英语学习卡片</h3>
+            <input type="hidden" id="editCardId" value="">
+            <div class="form-item">
+                <label class="form-label">卡片标题（词汇/句型/考点）</label>
+                <input type="text" class="form-input" id="cardTitle" placeholder="例：analyse / 主谓一致 用法">
+            </div>
+            <div class="form-item">
+                <label class="form-label">卡片分类标签</label>
+                <select class="form-select" id="cardTag">
+                    <option value="核心词汇">核心词汇</option>
+                    <option value="基础句型">基础句型</option>
+                    <option value="语法考点">语法考点</option>
+                    <option value="写作素材">写作素材</option>
+                </select>
+            </div>
+            <div class="form-item">
+                <label class="form-label">卡片内容</label>
+                <div class="format-btn-group">
+                    <button class="format-btn" onclick="addFormatTag('b')">加粗</button>
+                    <button class="format-btn" onclick="addFormatTag('br')">换行</button>
+                    <button class="format-btn" onclick="addFormatTag('blockquote')">引用</button>
+                    <button class="format-btn" onclick="addFormatTag('ul')">无序列表</button>
+                    <button class="format-btn" onclick="addFormatTag('ol')">有序列表</button>
+                    <button class="format-btn" onclick="addFormatTag('li')">列表项</button>
+                </div>
+                <textarea class="form-textarea" id="cardContent" placeholder="请输入卡片内容，支持富文本编辑"></textarea>
+                <p class="form-tips">标题匹配自动加粗变红｜左滑点按钮操作｜长按查系统词典｜☆一键收藏｜自定义标签可删除</p>
+            </div>
+            <div class="form-item" id="dateItem" style="display: none;">
+                <label class="form-label">所属日期</label>
+                <input type="date" class="form-input" id="cardDate">
+            </div>
+            <div class="modal-btn-group">
+                <button class="modal-btn cancel-btn" onclick="closeModal()">取消</button>
+                <button class="modal-btn confirm-btn" id="modalConfirmBtn" onclick="submitCard()">确认添加</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEditCard = null;
+        // 保留系统默认标签（不可删除）
+        const systemTags = ['全部卡片', '核心词汇', '基础句型', '语法考点', '写作素材'];
+        
+        // 跳转到对应日期分组
+        function jumpToDateGroup(dateKey) {
+            const dateGroups = document.querySelectorAll('.date-group');
+            let found = false;
+            
+            dateGroups.forEach(group => {
+                const dateText = group.querySelector('.date-title span:nth-child(2)').textContent.trim();
+                if (dateText === dateKey) {
+                    found = true;
+                    // 展开该日期分组
+                    const cardsWrap = group.querySelector('.date-cards-wrap');
+                    const toggleIcon = group.querySelector('.date-toggle-icon');
+                    cardsWrap.style.height = cardsWrap.scrollHeight + 'px';
+                    toggleIcon.textContent = '▼';
+                    
+                    // 滚动到该日期分组
+                    group.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+            
+            if (!found) {
+                alert('未找到该日期的卡片分组');
+            }
+        }
+        
+        // 保存卡片数据到localStorage
+        function saveCardDataToLocalStorage() {
+            const cardData = {};
+            
+            // 遍历所有日期分组
+            document.querySelectorAll('.date-group').forEach(group => {
+                const dateText = group.querySelector('.date-title span:nth-child(2)').textContent.trim();
+                const cardContainers = group.querySelectorAll('.card-container');
+                
+                if (cardContainers.length > 0) {
+                    const cards = [];
+                    cardContainers.forEach(container => {
+                        const card = container.querySelector('.card');
+                        const title = card.querySelector('.card-title-text').textContent.trim();
+                        const content = card.querySelector('.card-content').innerHTML;
+                        const tag = card.dataset.tag;
+                        
+                        cards.push({ title, content, tag });
+                    });
+                    
+                    cardData[dateText] = cards;
+                }
+            });
+            
+            localStorage.setItem('cardData', JSON.stringify(cardData));
+        }
+        
+        // 页面加载初始化 - 修复bug，保留所有初始化逻辑
+        window.onload = function() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayFormat = today.replace(/-/g, '.');
+            document.getElementById('cardDate').value = today;
+            
+            // 修复：严格匹配日期，保留自动创建当日日期栏功能
+            let hasTodayGroup = false;
+            document.querySelectorAll('.date-title').forEach(title => {
+                const dateText = title.querySelector('span:nth-child(2)').textContent.trim();
+                if(dateText === todayFormat) {
+                    hasTodayGroup = true;
+                }
+            });
+            if(!hasTodayGroup){
+                createNewDateGroup(todayFormat);
+            }
+            
+            // 保留标题匹配功能
+            highlightTitleMatchInAllCards();
+            // 保留左滑初始化
+            initCardSwipe();
+            // 保留计数更新
+            updateAllDateCardCount();
+            // 保留标签删除按钮初始化
+            initTagDeleteBtn();
+            
+            // 修复：初始化日期栏高度，保留展开状态
+            document.querySelectorAll('.date-cards-wrap').forEach(wrap => {
+                setTimeout(() => {
+                    wrap.style.height = wrap.scrollHeight + 'px';
+                }, 300);
+            });
+
+            // 保留所有卡片默认展开功能
+            document.querySelectorAll('.card-content-wrap').forEach(wrap => {
+                wrap.classList.remove('collapse');
+                wrap.style.maxHeight = '2000px';
+                wrap.style.opacity = '1';
+            });
+            document.querySelectorAll('.card-title-toggle').forEach(icon => {
+                icon.textContent = '−';
+            });
+            
+            // 初始化卡片点击选中事件
+            initCardSelection();
+            
+            // 检查URL参数，跳转到对应日期
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetDate = urlParams.get('date');
+            if (targetDate) {
+                jumpToDateGroup(targetDate);
+            }
+            
+            // 保存初始卡片数据到localStorage
+            saveCardDataToLocalStorage();
+        }
+        
+        // 卡片选中状态管理
+        function initCardSelection() {
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // 排除点击收藏按钮和标题折叠按钮的情况
+                    if (!e.target.closest('.collect-btn') && !e.target.closest('.card-title-toggle')) {
+                        // 移除其他卡片的选中状态
+                        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+                        // 添加当前卡片的选中状态
+                        this.classList.add('selected');
+                    }
+                });
+            });
+        }
+
+        // 保留标题匹配功能 - 仅修复重复嵌套bug
+        function highlightTitleMatch(card) {
+            const contentEl = card.querySelector('.card-content');
+            let content = contentEl.innerHTML;
+            // 修复：清除原有匹配样式，避免重复嵌套
+            content = content.replace(/<span class="title-match">(.*?)<\/span>/gmi, '$1');
+            
+            const title = card.querySelector('.card-title-text').textContent.trim();
+            if (!title) return;
+            
+            // 保留正则转义，修复特殊字符匹配
+            const escapedTitle = title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(`(${escapedTitle})`, 'gmi');
+            
+            content = content.replace(regex, (match) => `<span class="title-match">${match}</span>`);
+            contentEl.innerHTML = content;
+        }
+        
+        // 保留批量标题匹配
+        function highlightTitleMatchInAllCards() {
+            const allCards = document.querySelectorAll('.card');
+            allCards.forEach(card => {
+                highlightTitleMatch(card);
+            });
+        }
+
+        // 保留左滑卡片功能 - 仅修复滑动逻辑bug
+        function initCardSwipe() {
+            const cardContainers = document.querySelectorAll('.card-container');
+            cardContainers.forEach(container => {
+                let startX = 0;
+                let moveX = 0;
+                let isSwiping = false;
+                const card = container.querySelector('.card');
+                const btnGroupWidth = container.querySelector('.card-btn-group').offsetWidth;
+
+                // 保留卡片复位
+                card.style.transform = 'translateX(0)';
+
+                function handleTouchStart(e) {
+                    startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+                    isSwiping = true;
+                    e.stopPropagation();
+                }
+                
+                function handleTouchMove(e) {
+                    if(!isSwiping) return;
+                    const currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+                    moveX = currentX - startX;
+                    // 保留左滑限制
+                    if (moveX < 0) { 
+                        const translateX = Math.max(moveX, -btnGroupWidth);
+                        card.style.transform = `translateX(${translateX}px)`;
+                        if(e.type === 'touchmove') e.preventDefault();
+                    }
+                }
+                
+                function handleTouchEnd() {
+                    if (isSwiping) {
+                        // 保留滑动判定逻辑
+                        if (moveX < -btnGroupWidth/2) {
+                            card.style.transform = `translateX(-${btnGroupWidth}px)`;
+                        } else {
+                            card.style.transform = 'translateX(0)';
+                        }
+                    }
+                    isSwiping = false;
+                    startX = 0;
+                    moveX = 0;
+                }
+
+                // 保留触屏和鼠标事件绑定
+                container.addEventListener('touchstart', handleTouchStart, {passive: true});
+                container.addEventListener('touchmove', handleTouchMove, {passive: false});
+                container.addEventListener('touchend', handleTouchEnd);
+                container.addEventListener('mousedown', handleTouchStart);
+                container.addEventListener('mousemove', handleTouchMove);
+                container.addEventListener('mouseup', handleTouchEnd);
+                container.addEventListener('mouseleave', handleTouchEnd);
+            });
+        }
+
+        // 保留删除卡片功能 - 仅修复DOM定位bug
+        function deleteCard(btn) {
+            const btnGroup = btn.parentElement;
+            const container = btnGroup.parentElement;
+            const card = container.querySelector('.card');
+            const dateGroup = container.closest('.date-group');
+            
+            if (confirm('确定删除该卡片吗？删除后无法恢复！')) {
+                card.style.transform = 'translateX(0)';
+                setTimeout(() => {
+                    container.remove();
+                    // 保留计数更新
+                    updateSingleDateCardCount(dateGroup);
+                    if (dateGroup.querySelectorAll('.card-container').length === 0) {
+                        dateGroup.style.display = 'none';
+                    }
+                    // 保留搜索同步
+                    globalFullSearch();
+                }, 300);
+            } else {
+                card.style.transform = 'translateX(0)';
+            }
+        }
+
+        // 保留编辑卡片功能 - 显示HTML代码以便富文本编辑
+        // HTML转换为友好标记
+        function htmlToFriendlyMarkdown(html) {
+            let text = html;
+            
+            // 转换加粗 <b>文本</b> -> **文本**
+            text = text.replace(/<b>(.*?)<\/b>/g, '**$1**');
+            
+            // 转换引用 <blockquote>文本</blockquote> -> > 文本
+            text = text.replace(/<blockquote>(.*?)<\/blockquote>/g, '> $1');
+            
+            // 转换无序列表 <ul><li>文本</li></ul> -> - 文本
+            text = text.replace(/<ul>(.*?)<\/ul>/gs, '$1');
+            text = text.replace(/<li>(.*?)<\/li>/g, '- $1');
+            
+            // 转换有序列表 <ol><li>文本</li></ol> -> 1. 文本
+            text = text.replace(/<ol>(.*?)<\/ol>/gs, '$1');
+            text = text.replace(/<li>(.*?)<\/li>/g, '1. $1');
+            
+            // 转换换行 <br> -> \n
+            text = text.replace(/<br>/g, '\n');
+            
+            // 移除其他HTML标签
+            text = text.replace(/<[^>]*>/g, '');
+            
+            return text;
+        }
+
+        function editCard(btn) {
+            const btnGroup = btn.parentElement;
+            currentEditCard = btnGroup.parentElement;
+            const card = currentEditCard.querySelector('.card');
+            
+            // 获取数据
+            const cardTitle = card.querySelector('.card-title-text').textContent.trim();
+            const cardTag = card.dataset.tag;
+            const contentEl = card.querySelector('.card-content');
+            let cardContent = contentEl.innerHTML;
+            cardContent = cardContent.replace(/<span class="title-match">(.*?)<\/span>/gmi, '$1');
+            
+            // 将HTML转换为友好标记，用于编辑
+            const friendlyContent = htmlToFriendlyMarkdown(cardContent);
+            
+            const dateGroup = currentEditCard.closest('.date-group');
+            const cardDateText = dateGroup.querySelector('.date-title span:nth-child(2)').textContent.trim();
+            const cardDate = cardDateText.replace(/\./g, '-');
+
+            // 弹窗填充逻辑
+            document.getElementById('modalTitle').textContent = '编辑英语学习卡片';
+            document.getElementById('modalConfirmBtn').textContent = '确认修改';
+            document.getElementById('cardTitle').value = cardTitle;
+            document.getElementById('cardTag').value = cardTag;
+            document.getElementById('cardContent').value = friendlyContent;
+            document.getElementById('cardDate').value = cardDate;
+            document.getElementById('dateItem').style.display = 'block';
+            
+            openModal('edit');
+            card.style.transform = 'translateX(0)';
+        }
+
+        // 保留标签删除功能 - 完全保留原有逻辑
+        function initTagDeleteBtn() {
+            document.querySelectorAll('.tag-item:not(.system-tag)').forEach(tagItem => {
+                addDeleteBtnToTag(tagItem);
+            });
+        }
+        
+        function addDeleteBtnToTag(tagItem) {
+            if (tagItem.querySelector('.tag-del-btn')) return;
+            
+            const delBtn = document.createElement('span');
+            delBtn.className = 'tag-del-btn';
+            delBtn.textContent = '×';
+            delBtn.onclick = function(e) {
+                e.stopPropagation();
+                deleteTag(this);
+            };
+            
+            tagItem.appendChild(delBtn);
+        }
+        
+        function deleteTag(delBtn) {
+            const tagItem = delBtn.parentElement;
+            const tagName = tagItem.textContent.replace('×', '').trim();
+            
+            if (confirm(`确定删除标签「${tagName}」吗？`)) {
+                const isActive = tagItem.classList.contains('active');
+                tagItem.remove();
+                
+                const select = document.getElementById('cardTag');
+                const options = select.querySelectorAll('option');
+                options.forEach(option => {
+                    if (option.value === tagName) {
+                        option.remove();
+                    }
+                });
+                
+                if (isActive) {
+                    document.querySelector('.tag-item.system-tag[onclick="filterCard(\'all\')"]').click();
+                } else {
+                    const activeTag = document.querySelector('.tag-item.active').textContent.replace('×', '').trim();
+                    filterCard(activeTag === '全部卡片' ? 'all' : activeTag);
+                }
+                
+                updateAllDateCardCount();
+                alert(`标签「${tagName}」已成功删除！`);
+            }
+        }
+
+        // 保留新增自定义标签功能 - 完全保留原有逻辑
+        function addCustomTag() {
+            const newTag = document.getElementById('newTagName').value.trim();
+            if (!newTag || Array.from(document.querySelectorAll('.tag-item')).some(item => 
+                item.textContent.replace('×', '').trim() === newTag
+            )) {
+                alert('标签不能为空或已存在！');
+                return;
+            }
+            
+            const tagList = document.getElementById('tagList');
+            const newTagItem = document.createElement('div');
+            newTagItem.className = 'tag-item';
+            newTagItem.onclick = () => filterCard(newTag);
+            newTagItem.textContent = newTag;
+            
+            tagList.appendChild(newTagItem);
+            addDeleteBtnToTag(newTagItem);
+            
+            const cardTagSelect = document.getElementById('cardTag');
+            const newOption = document.createElement('option');
+            newOption.value = newTag;
+            newOption.textContent = newTag;
+            cardTagSelect.appendChild(newOption);
+            
+            document.getElementById('newTagName').value = '';
+            const activeTag = document.querySelector('.tag-item.active').textContent.replace('×', '').trim();
+            filterCard(activeTag === '全部卡片' ? 'all' : activeTag);
+            alert(`自定义标签「${newTag}」添加成功！（点击×可删除）`);
+        }
+
+        // 完全保留收藏功能
+        function toggleCollect(btn, event) {
+            event.stopPropagation();
+            const card = btn.closest('.card');
+            if(btn.textContent === '☆'){
+                btn.textContent = '★';
+                card.classList.add('collect');
+            } else {
+                btn.textContent = '☆';
+                card.classList.remove('collect');
+            }
+            globalFullSearch();
+        }
+
+        // 保留卡片折叠/展开 - 修复显示bug，保留交互逻辑
+        function toggleCardContent(titleEl) {
+            const contentWrap = titleEl.nextElementSibling;
+            const toggleIcon = titleEl.querySelector('.card-title-toggle');
+            
+            if(contentWrap.classList.contains('collapse')){
+                contentWrap.classList.remove('collapse');
+                toggleIcon.textContent = '−';
+                contentWrap.style.maxHeight = '2000px';
+                contentWrap.style.opacity = '1';
+            } else {
+                contentWrap.classList.add('collapse');
+                toggleIcon.textContent = '+';
+                contentWrap.style.maxHeight = '0';
+                contentWrap.style.opacity = '0';
+            }
+            
+            // 保留高度更新
+            const dateCardsWrap = titleEl.closest('.date-cards-wrap');
+            setTimeout(() => {
+                dateCardsWrap.style.height = dateCardsWrap.scrollHeight + 'px';
+            }, 100);
+        }
+
+        // 完全保留日期栏计数更新功能
+        function updateSingleDateCardCount(dateGroup) {
+            const cardNum = dateGroup.querySelectorAll('.card-container').length;
+            const countDom = dateGroup.querySelector('.date-card-count');
+            countDom.textContent = `${cardNum}张`;
+            dateGroup.style.display = cardNum === 0 ? 'none' : 'block';
+        }
+        
+        function updateAllDateCardCount() {
+            document.querySelectorAll('.date-group').forEach(group => updateSingleDateCardCount(group));
+        }
+
+        // 保留日期栏折叠/展开 - 修复高度计算bug
+        function toggleDateGroup(titleEl) {
+            const cardsWrap = titleEl.nextElementSibling;
+            const toggleIcon = titleEl.querySelector('.date-toggle-icon');
+            
+            if (cardsWrap.style.height === '0px' || !cardsWrap.style.height) {
+                setTimeout(() => {
+                    cardsWrap.style.height = cardsWrap.scrollHeight + 'px';
+                }, 100);
+                toggleIcon.textContent = '▼';
+            } else {
+                cardsWrap.style.height = '0px';
+                toggleIcon.textContent = '▶';
+            }
+        }
+
+        // 完全保留标签筛选功能
+        function filterCard(tag) {
+            const allTags = document.querySelectorAll('.tag-item');
+            const allContainers = document.querySelectorAll('.card-container');
+            
+            allTags.forEach(item => item.classList.remove('active'));
+            document.querySelectorAll('.tag-item').forEach(item => {
+                if(item.textContent.replace('×', '').trim() === (tag === 'all' ? '全部卡片' : tag)) {
+                    item.classList.add('active');
+                }
+            });
+            
+            allContainers.forEach(container => {
+                const card = container.querySelector('.card');
+                container.style.display = (tag === 'all' || card.dataset.tag === tag) ? 'block' : 'none';
+            });
+            
+            updateAllDateCardCount();
+            document.querySelectorAll('.date-cards-wrap').forEach(wrap => {
+                setTimeout(() => {
+                    wrap.style.height = wrap.scrollHeight + 'px';
+                }, 100);
+            });
+        }
+
+        // 增强富文本编辑功能 - 使用友好标记
+        function addFormatTag(tag) {
+            const textarea = document.getElementById('cardContent');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            let newText = '';
+            
+            // 使用友好的标记方式，而不是直接显示HTML标签
+            if (tag === 'b') newText = `**${selectedText}**`;
+            if (tag === 'br') newText = `\n${selectedText}`;
+            if (tag === 'blockquote') newText = `> ${selectedText}`;
+            if (tag === 'ul') newText = `- ${selectedText}`;
+            if (tag === 'ol') newText = `1. ${selectedText}`;
+            if (tag === 'li') newText = `- ${selectedText}`;
+            if (tag === 'p') newText = `${selectedText}\n`;
+            
+            textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
+            textarea.focus();
+        }
+
+        // 保留全局搜索功能 - 修复收藏搜索bug
+        function globalFullSearch() {
+            const keyword = document.getElementById('globalSearch').value.toLowerCase().trim();
+            const allContainers = document.querySelectorAll('.card-container');
+            const activeTag = document.querySelector('.tag-item.active').textContent.replace('×', '').trim();
+            const filterTag = activeTag === '全部卡片' ? 'all' : activeTag;
+
+            if (!keyword) {
+                allContainers.forEach(container => {
+                    const card = container.querySelector('.card');
+                    container.style.display = (filterTag === 'all' || card.dataset.tag === filterTag) ? 'block' : 'none';
+                });
+                updateAllDateCardCount();
+                document.querySelectorAll('.date-cards-wrap').forEach(wrap => {
+                    setTimeout(() => {
+                        wrap.style.height = wrap.scrollHeight + 'px';
+                    }, 100);
+                });
+                return;
+            }
+            
+            allContainers.forEach(container => {
+                const card = container.querySelector('.card');
+                const cardTitle = card.querySelector('.card-title-text').textContent.toLowerCase();
+                const contentHtml = card.querySelector('.card-content').innerHTML;
+                const cardContent = contentHtml.replace(/<[^>]*>/g, '').toLowerCase();
+                const isCollected = card.classList.contains('collect');
+                const tagMatch = filterTag === 'all' || card.dataset.tag === filterTag;
+                const textMatch = cardTitle.includes(keyword) || cardContent.includes(keyword);
+                
+                container.style.display = (keyword === '收藏' && isCollected && tagMatch) || (textMatch && tagMatch) ? 'block' : 'none';
+            });
+            
+            updateAllDateCardCount();
+            document.querySelectorAll('.date-cards-wrap').forEach(wrap => {
+                setTimeout(() => {
+                    wrap.style.height = wrap.scrollHeight + 'px';
+                }, 100);
+            });
+        }
+
+        // 保留弹窗开关 - 修复动画bug，保留逻辑
+        function openModal(type) {
+            const modal = document.getElementById('cardModal');
+            if (type === 'edit') {
+                document.getElementById('modalTitle').textContent = '编辑英语学习卡片';
+                document.getElementById('modalConfirmBtn').textContent = '确认修改';
+                document.getElementById('dateItem').style.display = 'block';
+            } else {
+                document.getElementById('modalTitle').textContent = '新增英语学习卡片';
+                document.getElementById('modalConfirmBtn').textContent = '确认添加';
+                document.getElementById('dateItem').style.display = 'none';
+                document.getElementById('cardTitle').value = '';
+                document.getElementById('cardContent').value = '';
+                document.getElementById('cardTag').value = '核心词汇';
+                currentEditCard = null;
+            }
+            
+            modal.style.display = 'flex';
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 10);
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('cardModal');
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                if(!currentEditCard) {
+                    document.getElementById('cardTitle').value = '';
+                    document.getElementById('cardContent').value = '';
+                }
+            }, 300);
+        }
+
+        // 友好标记转换为HTML
+        function friendlyMarkdownToHtml(text) {
+            let html = text;
+            
+            // 转换加粗 **文本** -> <b>文本</b>
+            html = html.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            
+            // 转换引用 > 文本 -> <blockquote>文本</blockquote>
+            html = html.replace(/^(> )(.*)$/gm, '<blockquote>$2</blockquote>');
+            
+            // 转换无序列表 - 文本 -> <ul><li>文本</li></ul>
+            // 注意：这是简化处理，实际应用可能需要更复杂的逻辑
+            html = html.replace(/^(- )(.*)$/gm, '<li>$2</li>');
+            if (html.includes('<li>')) {
+                html = `<ul>${html}</ul>`;
+            }
+            
+            // 转换有序列表 1. 文本 -> <ol><li>文本</li></ol>
+            // 注意：这是简化处理，实际应用可能需要更复杂的逻辑
+            html = html.replace(/^(1\. )(.*)$/gm, '<li>$2</li>');
+            if (html.includes('<ol>') && html.includes('<li>')) {
+                html = html.replace('<ul>', '<ol>');
+                html = html.replace('</ul>', '</ol>');
+            }
+            
+            // 转换换行
+            html = html.replace(/\n/g, '<br>');
+            
+            return html;
+        }
+
+        // 保留提交卡片功能 - 修改为友好标记转HTML
+        function submitCard() {
+            const title = document.getElementById('cardTitle').value.trim();
+            const tag = document.getElementById('cardTag').value;
+            const content = document.getElementById('cardContent').value.trim();
+            const dateVal = currentEditCard ? document.getElementById('cardDate').value : new Date().toISOString().split('T')[0];
+            const dateFormat = dateVal.replace(/-/g, '.');
+
+            if (!title || !content) { 
+                alert('卡片标题和内容不能为空！'); 
+                return; 
+            }
+
+            // 将友好标记转换为HTML格式
+            let htmlContent = friendlyMarkdownToHtml(content);
+
+            // 编辑卡片
+            if (currentEditCard) {
+                const oldDateGroup = currentEditCard.closest('.date-group');
+                const card = currentEditCard.querySelector('.card');
+                
+                card.querySelector('.card-title-text').textContent = title;
+                card.dataset.tag = tag;
+                card.querySelector('.card-content').innerHTML = htmlContent;
+                card.querySelector('.card-tag').textContent = tag;
+                
+                setTimeout(() => {
+                    highlightTitleMatch(card);
+                }, 200);
+                
+                let newDateGroup = null;
+                document.querySelectorAll('.date-group').forEach(group => {
+                    const dateText = group.querySelector('.date-title span:nth-child(2)').textContent.trim();
+                    if(dateText === dateFormat) {
+                        newDateGroup = group;
+                    }
+                });
+                
+                if(oldDateGroup.querySelector('.date-title span:nth-child(2)').textContent.trim() !== dateFormat) {
+                    oldDateGroup.querySelector('.date-cards-wrap').removeChild(currentEditCard);
+                    if(newDateGroup) {
+                        newDateGroup.querySelector('.date-cards-wrap').appendChild(currentEditCard);
+                    } else {
+                        newDateGroup = createNewDateGroup(dateFormat, currentEditCard);
+                    }
+                    updateSingleDateCardCount(oldDateGroup);
+                }
+                
+                setTimeout(() => {
+                    currentEditCard.closest('.date-cards-wrap').style.height = currentEditCard.closest('.date-cards-wrap').scrollHeight + 'px';
+                }, 100);
+                
+                updateSingleDateCardCount(currentEditCard.closest('.date-group'));
+                alert('卡片修改成功！');
+            } 
+            // 新增卡片
+            else {
+                let dateGroup = null;
+                document.querySelectorAll('.date-group').forEach(group => {
+                    const dateText = group.querySelector('.date-title span:nth-child(2)').textContent.trim();
+                    if(dateText === dateFormat) {
+                        dateGroup = group;
+                    }
+                });
+                
+                if (!dateGroup) { 
+                    dateGroup = createNewDateGroup(dateFormat); 
+                }
+                
+                const newCardContainer = createNewCard(title, tag, htmlContent);
+                dateGroup.querySelector('.date-cards-wrap').appendChild(newCardContainer);
+                
+                const newCard = newCardContainer.querySelector('.card');
+                setTimeout(() => {
+                    highlightTitleMatch(newCard);
+                }, 200);
+                
+                initCardSwipe();
+                
+                setTimeout(() => {
+                    dateGroup.querySelector('.date-cards-wrap').style.height = dateGroup.querySelector('.date-cards-wrap').scrollHeight + 'px';
+                }, 100);
+                
+                updateSingleDateCardCount(dateGroup);
+                alert('卡片添加成功！');
+            }
+            
+            closeModal();
+            globalFullSearch();
+            
+            // 保存卡片数据到localStorage
+            saveCardDataToLocalStorage();
+        }
+
+        // 保留创建新日期组 - 修复插入位置bug
+        function createNewDateGroup(dateFormat, cardContainer) {
+            const newDateGroup = document.createElement('div');
+            newDateGroup.className = 'date-group';
+            newDateGroup.innerHTML = `
+                <div class="date-title" onclick="toggleDateGroup(this)">
+                    <span class="date-icon">📅</span>
+                    <span>${dateFormat}</span>
+                    <span class="date-card-count">0张</span>
+                    <div class="date-right-wrap">
+                        <span class="date-toggle-icon">▼</span>
+                    </div>
+                </div>
+                <div class="date-cards-wrap" style="height: auto"></div>
+            `;
+            
+            // 修复插入位置，保留创建逻辑
+            const dateGroupsContainer = document.getElementById('dateGroupsContainer');
+            dateGroupsContainer.appendChild(newDateGroup);
+            
+            if(cardContainer) {
+                newDateGroup.querySelector('.date-cards-wrap').appendChild(cardContainer);
+            }
+            
+            const wrap = newDateGroup.querySelector('.date-cards-wrap');
+            setTimeout(() => {
+                wrap.style.height = wrap.scrollHeight + 'px';
+            }, 300);
+            
+            return newDateGroup;
+        }
+
+        // 保留创建新卡片 - 修复展开状态
+        function createNewCard(title, tag, content) {
+            const container = document.createElement('div');
+            container.className = 'card-container';
+            container.innerHTML = `
+                <div class="card-btn-group">
+                    <div class="card-edit-btn" onclick="editCard(this)">编辑</div>
+                    <div class="card-delete-btn" onclick="deleteCard(this)">删除</div>
+                </div>
+                <div class="card" data-tag="${tag}">
+                    <div class="card-title" onclick="toggleCardContent(this)">
+                        <div class="card-title-left">
+                            <span class="collect-btn" onclick="toggleCollect(this, event)">☆</span>
+                            <span class="card-title-text">${title}</span>
+                        </div>
+                        <span class="card-title-toggle">−</span>
+                    </div>
+                    <div class="card-content-wrap" style="max-height: 2000px; opacity: 1;">
+                        <div class="card-content"></div>
+                        <span class="card-tag">${tag}</span>
+                    </div>
+                </div>
+            `;
+            
+            // 单独设置卡片内容，确保HTML标签被正确渲染
+            container.querySelector('.card-content').innerHTML = content;
+            
+            return container;
+        }
+        
+        // 保留点击外部关闭弹窗
+        document.getElementById('cardModal').addEventListener('click', function(e) {
+            if(e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
